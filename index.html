@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Sample: Multi Party Calling</title>
+    <title>Sample: Single Party Calling</title>
     <link rel="stylesheet" href="https://downloads.momentum-ui.com/@momentum-ui/core/css/momentum-ui.css">
     <style>
       main {
@@ -18,7 +18,7 @@
       thead th {
         font-weight: bold;
       }
-      tbody td, th {
+      tbody td {
         min-width: 150px;
       }
     </style>
@@ -35,14 +35,15 @@
           </a>
         </div>
         <nav class="md-top-bar__nav ">
-          <div class="md-list md-list--horizontal" role="list">
+            <div class="md-list md-list--horizontal" role="list">
 
-          </div>
-        </nav>
+            </div>
+          </nav>
       </div>
     </header>
     <main>
-      <h1>Multi Party Calling</h1>
+      <h1>Single Party Calling</h1>
+      <p>This sample demonstrates 1:1 calling.</p>
       <form id="credentials">
         <fieldset>
           <legend>Credentials</legend>
@@ -62,9 +63,19 @@
           <input
             id="invitee"
             name="invitee"
-            placeholder="Room ID or SIP URI"
+            placeholder="Person ID or Email Address or SIP URI or Room ID"
             type="text">
             <input title="dial" type="submit" value="dial">
+        </fieldset>
+      </form>
+
+      <form id="constraints">
+        <fieldset>
+          <legend>Constraints</legend>
+          <input id="constraints-audio" title="audio" type="checkbox" checked>
+          <label for="constraints-audio">Audio</label>
+          <input id="constraints-video" title="video" type="checkbox" checked>
+          <label for="constraints-video">Video</label>
         </fieldset>
       </form>
 
@@ -72,37 +83,46 @@
         <fieldset>
           <legend>Call Controls</legend>
           <button id="hangup" title="hangup" type="button">cancel/hangup</button>
+          <button id="extractlocalframe" title="extractlocalframe" type="button">extract local frame</button>
+          <button id="extractremoteframe" title="extractremoteframe" type="button">extract remote frame</button>
+          <button id="enablefacerec" title="enablefacerec" type="button">detect facial expressions</button>
         </fieldset>
       </form>
 
       <table id="call-status">
-          <thead>
-              <tr><th colspan="3">Call Membership Status</th></tr>
-              <tr>
-                <th>User</th>
-                <th>Call status</th>
-                <th>Is Local?</th>
-              </tr>
-          </thead>
-          <tbody id="call-members">
-          </tbody>
-        </table>
+        <thead>
+            <tr>
+                <th colspan="2">Call Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Local Participant</td>
+                <td id="call-status-local"></td>
+            </tr>
+            <tr>
+              <td>Remote Participant</td>
+              <td id="call-status-remote"></td>
+          </tr>
+        </tbody>
+      </table>
 
       <div style="display: flex">
-        <video style="width:50%; display: none" id="self-view" muted autoplay playsinline></video>
-        <div style="width:50%">
+        <video style="width:50%" id="self-view" muted autoplay playsinline></video>
+        <div style="width:50%; position:relative;">
           <audio id="remote-view-audio" autoplay playsinline></audio>
-          <video id="remote-view-video" autoplay playsinline></video>
+          <video style="width:100%" id="remote-view-video" autoplay muted playsinline></video>
+          <canvas style="width:100%; position:absolute; top:0; left:0" id="face-rec-overlay"></canvas>
         </div>
       </div>
       <div style="display: flex">
-        <canvas style="width:50%; background-color: pink;" id="self-view-canvas"></canvas>
+        <canvas style="width:50%" id="self-view-canvas"></canvas>
+        <canvas style="width:50%" id="audio-visualisation-canvas"></canvas>
       </div>
     </main>
 
-    <!-- /bundle.js is the bundled Webex JavaScript SDK -->
-    <script src="/bundle.js"></script>
     <!-- app.js is your application code -->
-    <script src="./public/app.js"></script>
+    <script src="bundle.js"></script>
+    <script src="face-api.js"></script>
   </body>
 </html>

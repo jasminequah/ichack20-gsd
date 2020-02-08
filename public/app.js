@@ -1,9 +1,16 @@
 const Webex = require('webex');
 
-const accessToken = 'INSERT_ACCESS_TOKEN_HERE';
+const accessToken = 'ZWRjM2RhNGEtZmE4Ny00ZTg3LWI3NTgtN2U4MjBlMGQ1OGRhYjRiZGExZjctYTA3_PF84_1b1196c3-dcba-4ea0-ad0d-6aabb5e49fdb';
 
-// Declare some globals that we'll need throughout
-let activeMeeting, webex;
+if (accessToken === '<insert_your_access_token_here>') {
+  alert('Please add your access token to app.js');
+}
+
+let webex = Webex.init({
+  credentials: {
+    access_token: accessToken
+  }
+});
 
 // First, let's wire our form fields up to localStorage so we don't have to
 // retype things everytime we reload the page.
@@ -42,7 +49,7 @@ function connect() {
 
     // Listen for added meetings
     webex.meetings.on('meeting:added', (addedMeetingEvent) => {
-      if (addedMeetingEvent.type === 'INCOMING' || addedMeetingEvent.type === 'JOIN') {
+      if (addedMeetingEvent.type === 'INCOMING') {
         const addedMeeting = addedMeetingEvent.meeting;
 
         // Acknowledge to the server that we received the call on our device
@@ -91,6 +98,7 @@ function connect() {
 // Similarly, there are a few different ways we'll get a meeting Object, so let's
 // put meeting handling inside its own function.
 function bindMeetingEvents(meeting) {
+  console.log("bind meeting called")
   // call is a call instance, not a promise, so to know if things break,
   // we'll need to listen for the error event. Again, this is a rather naive
   // handler.
@@ -105,14 +113,16 @@ function bindMeetingEvents(meeting) {
     }
     if (media.type === 'local') {
       document.getElementById('self-view').srcObject = media.stream;
+      setUpAudioVisualisation(media.stream)
     }
     if (media.type === 'remoteVideo') {
       document.getElementById('remote-view-video').srcObject = media.stream;
     }
     if (media.type === 'remoteAudio') {
       document.getElementById('remote-view-audio').srcObject = media.stream;
+      // setUpAudioVisualisation(media.stream)
+      greyscaleVideoProcessor.start()
     }
-    greyscaleVideoProcessor.start()
   });
 
   // Handle media streams stopping
@@ -133,7 +143,6 @@ function bindMeetingEvents(meeting) {
   meeting.members.on('members:update', (delta) => {
     const {full: membersData} = delta;
     const memberIDs = Object.keys(membersData);
-    let memberTableHTML = '';
 
     memberIDs.forEach((memberID) => {
       const memberObject = membersData[memberID];
@@ -141,39 +150,37 @@ function bindMeetingEvents(meeting) {
       // Devices are listed in the memberships object.
       // We are not concerned with them in this demo
       if (memberObject.isUser) {
-        const personId = memberObject.participant.person.id;
-        const memberTableRowHTML = `<tr id="member-${personId}">
-        <td id="member-name-${personId}">${memberObject.name}</td>
-        <td id="member-status-${personId}">${memberObject.status}</td>
-        <td id="member-isSelf-${personId}">${memberObject.isSelf}</td>
-        </tr>`;
-
-        memberTableHTML = memberTableHTML.concat(memberTableRowHTML);
+        if (memberObject.isSelf) {
+          document.getElementById('call-status-local').innerHTML = memberObject.status;
+        }
+        else {
+          document.getElementById('call-status-remote').innerHTML = memberObject.status;
+        }
       }
     });
-
-    document.getElementById('call-members').innerHTML = memberTableHTML;
   });
 
-  // Of course, we'd also like to be able to leave the meeting:
+  // Of course, we'd also like to be able to end the call:
   document.getElementById('hangup').addEventListener('click', () => {
     meeting.leave();
-  });
-
-  meeting.on('all', (event) => {
-    console.log(event);
   });
 }
 
 // Join the meeting and add media
 function joinMeeting(meeting) {
+  // Get constraints
+  const constraints = {
+    audio: document.getElementById('constraints-audio').checked,
+    video: document.getElementById('constraints-video').checked
+  };
+
   return meeting.join().then(() => {
     const mediaSettings = {
-      receiveVideo: true,
-      receiveAudio: true,
+      receiveVideo: constraints.video,
+      receiveAudio: constraints.audio,
       receiveShare: false,
-      sendVideo: true,
-      sendAudio: true,
+      sendVideo: constraints.video,
+      sendAudio: constraints.audio,
       sendShare: false
     };
 
@@ -188,16 +195,6 @@ function joinMeeting(meeting) {
     });
   });
 }
-
-// In order to simplify the state management needed to keep track of our button
-// handlers, we'll rely on the current meeting global object and only hook up event
-// handlers once.
-
-document.getElementById('hangup').addEventListener('click', () => {
-  if (activeMeeting) {
-    activeMeeting.leave();
-  }
-});
 
 // Now, let's set up incoming call handling
 document.getElementById('credentials').addEventListener('submit', (event) => {
@@ -221,13 +218,9 @@ document.getElementById('dialer').addEventListener('submit', (event) => {
     .then(() => {
       // Create the meeting
       return webex.meetings.create(destination).then((meeting) => {
-        // Save meeting
-        activeMeeting = meeting;
-
         // Call our helper function for binding events to meetings
         bindMeetingEvents(meeting);
 
-        // Pass the meeting to our join meeting helper
         return joinMeeting(meeting);
       });
     })
@@ -239,6 +232,155 @@ document.getElementById('dialer').addEventListener('submit', (event) => {
     });
 });
 
+async function runFaceRec() {
+  // load face detection and face expression recognition models
+  await faceapi.loadFaceExpressionModel('/models')
+  // await faceapi.nets.ssdMobilenetv1.loadFromUri('/models')
+  await faceapi.nets.tinyFaceDetector.loadFromUri('/models')
+}
+
+const SSD_MOBILENETV1 = 'ssd_mobilenetv1'
+const TINY_FACE_DETECTOR = 'tiny_face_detector'
+
+let selectedFaceDetector = TINY_FACE_DETECTOR
+
+// ssd_mobilenetv1 options
+let minConfidence = 0.5
+
+// tiny_face_detector options
+let inputSize = 512
+let scoreThreshold = 0.5
+
+function getFaceDetectorOptions() {
+  return selectedFaceDetector === SSD_MOBILENETV1
+    ? new faceapi.SsdMobilenetv1Options({ minConfidence })
+    : new faceapi.TinyFaceDetectorOptions({ inputSize, scoreThreshold })
+}
+
+async function onPlay() {
+  let withBoxes = true
+
+  const videoEl = document.getElementById('remote-view-video');
+
+  if(videoEl.paused || videoEl.ended)
+    return setTimeout(() => onPlay())
+
+
+  const options = getFaceDetectorOptions()
+
+  const ts = Date.now()
+
+  const result = await faceapi.detectSingleFace(videoEl, options).withFaceExpressions()
+
+  if (result) {
+    const canvas = document.getElementById("face-rec-overlay");
+    const dims = faceapi.matchDimensions(canvas, videoEl, true)
+
+    const resizedResult = faceapi.resizeResults(result, dims)
+    const minConfidence = 0.05
+    if (withBoxes) {
+      faceapi.draw.drawDetections(canvas, resizedResult)
+    }
+    faceapi.draw.drawFaceExpressions(canvas, resizedResult, minConfidence)
+  }
+
+  setTimeout(() => onPlay())
+}
+
+document.getElementById('enablefacerec').addEventListener('click', () => {
+  runFaceRec().then(() => {
+    console.log("Face Rec models loaded\n");
+    onPlay();
+  }).catch(function(error) {
+    console.log("Error loading Face Rec models\n");
+    console.error(error.message);
+  });
+});
+
+document.getElementById('extractlocalframe').addEventListener('click', () => {
+  extractAndDownloadFrame('self-view', 'local-frame')
+});
+
+document.getElementById('extractremoteframe').addEventListener('click', () => {
+  extractAndDownloadFrame('remote-view-video', 'remote-frame')
+});
+
+function extractAndDownloadFrame(videoId, filename) {
+  var video = document.getElementById(videoId);
+  var canvas = document.createElement("canvas");
+  canvas.width = video.videoWidth
+  canvas.height = video.videoHeight
+  var context = canvas.getContext("2d");
+  context.drawImage(video, 0, 0);
+  var img = canvas.toDataURL("image/jpeg", 1.0);
+  downloadImage(img, filename + '.jpeg');
+}
+
+function downloadImage(data, filename) {
+  var a = document.createElement('a');
+  a.href = data;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+}
+
+function setUpAudioVisualisation(audioStream) {
+  var audioCtx = new AudioContext();
+
+  var source = audioCtx.createMediaStreamSource(audioStream);
+
+  var analyser = audioCtx.createAnalyser();
+  source.connect(analyser);
+  analyser.connect(audioCtx.destination)
+
+  analyser.fftSize = 2048;
+  var bufferLength = analyser.frequencyBinCount;
+  var dataArray = new Uint8Array(bufferLength);
+  analyser.getByteTimeDomainData(dataArray);
+
+  // Get a canvas defined with ID "oscilloscope"
+  var canvas = document.getElementById("audio-visualisation-canvas");
+  var canvasCtx = canvas.getContext("2d");
+
+  // draw an oscilloscope of the current audio source
+
+  function draw() {
+
+    requestAnimationFrame(draw);
+
+    analyser.getByteTimeDomainData(dataArray);
+
+    canvasCtx.fillStyle = "rgb(200, 200, 200)";
+    canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
+
+    canvasCtx.lineWidth = 2;
+    canvasCtx.strokeStyle = "rgb(0, 0, 0)";
+
+    canvasCtx.beginPath();
+
+    var sliceWidth = canvas.width * 1.0 / bufferLength;
+    var x = 0;
+
+    for (var i = 0; i < bufferLength; i++) {
+
+      var v = dataArray[i] / 128.0;
+      var y = v * canvas.height / 2;
+
+      if (i === 0) {
+        canvasCtx.moveTo(x, y);
+      } else {
+        canvasCtx.lineTo(x, y);
+      }
+
+      x += sliceWidth;
+    }
+
+    canvasCtx.lineTo(canvas.width, canvas.height / 2);
+    canvasCtx.stroke();
+  }
+
+  draw();
+}
 
 var greyscaleVideoProcessor = {
   timerCallback: function() {
