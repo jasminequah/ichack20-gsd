@@ -89,11 +89,14 @@
         </table>
 
       <div style="display: flex">
-        <video style="width:50%" id="self-view" muted autoplay playsinline></video>
+        <video style="width:50%; display: none" id="self-view" muted autoplay playsinline></video>
         <div style="width:50%">
           <audio id="remote-view-audio" autoplay playsinline></audio>
           <video id="remote-view-video" autoplay playsinline></video>
         </div>
+      </div>
+      <div style="display: flex">
+        <canvas style="width:50%; background-color: pink;" id="self-view-canvas"></canvas>
       </div>
     </main>
 
