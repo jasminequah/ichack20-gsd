@@ -1,6 +1,6 @@
 const Webex = require('webex');
 
-const accessToken = 'ZWRjM2RhNGEtZmE4Ny00ZTg3LWI3NTgtN2U4MjBlMGQ1OGRhYjRiZGExZjctYTA3_PF84_1b1196c3-dcba-4ea0-ad0d-6aabb5e49fdb';
+const accessToken = 'INSERT_ACCESS_TOKEN_HERE';
 
 // Declare some globals that we'll need throughout
 let activeMeeting, webex;
@@ -112,6 +112,7 @@ function bindMeetingEvents(meeting) {
     if (media.type === 'remoteAudio') {
       document.getElementById('remote-view-audio').srcObject = media.stream;
     }
+    greyscaleVideoProcessor.start()
   });
 
   // Handle media streams stopping
@@ -237,3 +238,44 @@ document.getElementById('dialer').addEventListener('submit', (event) => {
       // Implement error handling here
     });
 });
+
+
+var greyscaleVideoProcessor = {
+  timerCallback: function() {
+    if (this.video.paused || this.video.ended) {
+      return;
+    }
+    this.computeFrame();
+    var self = this;
+    setTimeout(function () {
+      self.timerCallback();
+    }, 16); // roughly 60 frames per second
+  },
+
+  start: function() {
+    this.video = document.getElementById("self-view");
+    this.c1 = document.getElementById("self-view-canvas");
+    this.c1.width = this.video.videoWidth
+    this.c1.height = this.video.videoHeight
+    this.ctx1 = this.c1.getContext("2d");
+    var self = this;
+    self.timerCallback();
+  },
+
+  computeFrame: function() {
+    this.ctx1.drawImage(this.video, 0, 0);
+    var frame = this.ctx1.getImageData(0, 0, this.c1.width, this.c1.height);
+    var l = frame.data.length / 4;
+
+    for (var i = 0; i < l; i++) {
+      var grey = (frame.data[i * 4 + 0] + frame.data[i * 4 + 1] + frame.data[i * 4 + 2]) / 3;
+
+      frame.data[i * 4 + 0] = grey;
+      frame.data[i * 4 + 1] = grey;
+      frame.data[i * 4 + 2] = grey;
+    }
+    this.ctx1.putImageData(frame, 0, 0);
+
+    return;
+  }
+};
