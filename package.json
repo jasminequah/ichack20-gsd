@@ -1,0 +1,25 @@
+{
+  "name": "webex-teams-browser-sdk-demo-with-facial-expression-recognition",
+  "version": "1.0.0",
+  "description": "## 1) Prerequisites Ensure you have Node.js installed on your OS and that you have a valid Webex Teams access token from [developer.webex.com](https://developer.webex.com/), this can be either a bot or personal user access token.",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/amankhoza/webex-teams-browser-sdk-demo-with-facial-expression-recognition.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/amankhoza/webex-teams-browser-sdk-demo-with-facial-expression-recognition/issues"
+  },
+  "homepage": "https://github.com/amankhoza/webex-teams-browser-sdk-demo-with-facial-expression-recognition#readme",
+  "dependencies": {
+    "express": "^4.17.1",
+    "webex": "^1.80.109"
+  }
+}
