@@ -16,10 +16,10 @@ def segment_image():
     if request.method == 'POST':
         # width = request.form.width
         # height = request.form.height
-        # data = request.form.data
-        # print(request.form)
-        data = request.get_json()
+        data = request.form
         print(data)
+        # data = request.get_json()
+        # print(data)
         # image = np.array(data.to_dict(), dtype=int)
         # print(data)
         image = data.reshape(300,400,4)
@@ -29,7 +29,7 @@ def segment_image():
         out_image = segm.get_foreground(image, seg_map)
         print(image)
         # print(request.get_json())  # parse as JSON
-        return out_image
+        return 200, 'OK'
 
     # GET request
     else:

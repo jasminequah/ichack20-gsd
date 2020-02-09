@@ -104,22 +104,23 @@ function startWebRTC(isOfferer) {
 
     // TODO: Process the newFrame here
     // console.log("HERE");
-    const url = new URL('http://127.0.0.1:5000/segment');
+    // const proxyUrl = 'https://fast-stream-41806.herokuapp.com/'
+    const url = 'http://127.0.0.1:5000/segment'
 
-    // const data = new FormData();
-    // data.append('file', pixels);
+    const data = new FormData();
+    data.append('file', pixels);
 
-    var data = JSON.stringify(pixels);
+    // var data = JSON.stringify(pixels);
 
-    var data = {
-      'image_base64': newCanvas.toDataURL("image/png")
-    }
+    // var data = {
+    //   'image_base64': newCanvas.toDataURL("image/png")
+    // }
 
+    // const processedImage = fetch(proxyUrl + url,
     const processedImage = fetch(url,
         {
             method: 'POST',
-            body: data,
-            // headers: { 'Content-Type': 'application/json' }
+            body: data
         }).then(response => {
             console.log(response.json());
             return response.json();
@@ -180,6 +181,17 @@ function startWebRTC(isOfferer) {
     }
   });
 }
+
+function getBase64Image(imgElem) {
+// imgElem must be on the same server otherwise a cross-origin error will be thrown "SECURITY_ERR: DOM Exception 18"
+    var canvas = document.createElement("canvas");
+    canvas.width = imgElem.clientWidth;
+    canvas.height = imgElem.clientHeight;
+    var ctx = canvas.getContext("2d");
+    ctx.drawImage(imgElem, 0, 0);
+    var dataURL = canvas.toDataURL("image/png");
+    return dataURL.replace(/^data:image\/(png|jpg);base64,/, "");
+  }
 
 function localDescCreated(desc) {
   pc.setLocalDescription(
