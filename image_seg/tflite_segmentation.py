@@ -13,6 +13,7 @@ import cv2
 import multiprocessing
 from concurrent.futures import ThreadPoolExecutor
 import pickle
+from scipy.ndimage.filters import gaussian_filter
 
 class Segmentor(object):
 
@@ -53,31 +54,30 @@ class Segmentor(object):
         #     return default
 
         seg_map[seg_map != 15] = 0
-        seg_map = np.array(imresize(seg_map, (height, width))/255, dtype = int)
+        seg_map = np.array(imresize(seg_map, (height, width))/255, dtype = float)
+        seg_map = gaussian_filter(seg_map, sigma=7)
+        seg_map = np.repeat(seg_map[:, :, np.newaxis], 3, axis=2)
 
         return seg_map
 
 
 
 def get_foreground(image, seg_map):
-    out_image = np.asarray(image).copy()
-    out_image[seg_map == 0] = 0
-    return out_image
+    out_image = np.asarray(image).copy().astype(float)
+    out_image *= seg_map
+    return out_image.astype(np.uint8)
 
 
 def combine_foregrounds(image1, seg_map1, image2, seg_map2):
     foreground1 = get_foreground(image1, seg_map1)
-    seg_map_diff = seg_map2.copy()
-    seg_map_diff[seg_map1 != 0] = 0
-    foreground2_diff = get_foreground(image2, seg_map_diff)
-    out_image = foreground1 + foreground2_diff
-    return out_image
+    foreground2 = get_foreground(image2, seg_map2)
+    return add_background(foreground2, foreground1, seg_map1)
 
 
 def add_background(image, foreground, seg_map):
-    out_image = image.copy()
-    out_image[seg_map != 0] = foreground[seg_map != 0]
-    return out_image
+    background = np.asarray(image).copy().astype(float)
+    background *= 1 - seg_map
+    return (background + foreground).astype(np.uint8)
 
 
 def vis_segmentation(images, seg_maps, out_images):

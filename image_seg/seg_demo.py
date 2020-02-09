@@ -24,7 +24,7 @@ def run_visualization(path):
     original_im = Image.open(path)
     img_array = np.asarray(original_im.convert('RGB'))
     seg_map = segm.get_segment_map(img_array)
-    out_image = segm.get_foreground(original_im, seg_map)
+    out_image = get_foreground(original_im, seg_map)
 
     vis_segmentation([original_im], [seg_map], [out_image])
 
@@ -45,22 +45,28 @@ def run_visualization2(path1, path2):
 # seg_maps = []
 # imgs = []
 # out_imgs = []
-# for i in range(3,10):
+# for i in range(3,8):
 #     # file = open("debug/seg" + str(i) + ".pkl", 'rb')
 #     # seg_maps.append(pickle.load(file))
 #     # file.close()
 #     file = open("debug/frame" + str(i) + ".pkl", 'rb')
 #     imgs.append(pickle.load(file))
 #     file.close()
-#     seg_maps.append(get_segment_map(imgs[-1]))
-#     out_imgs.append(get_foreground(imgs[-1], seg_maps[-1]))
+#     file = open("debug/seg" + str(i) + ".pkl", 'rb')
+#     seg_maps.append(pickle.load(file))
+#     file.close()
+#     # seg_maps.append(get_segment_map(imgs[-1]))
+#     # out_imgs.append(get_foreground(imgs[-1], seg_maps[-1]))
+#     file = open("debug/out" + str(i) + ".pkl", 'rb')
+#     out_imgs.append(pickle.load(file))
+#     file.close()
 #
 # vis_segmentation(imgs, seg_maps, out_imgs)
 
-# run_visualization('./billgates.jpg')
-# run_visualization2('./billgates.jpg', './billgates2.jpg')
-
-# i = 0
+# # run_visualization('./billgates.jpg')
+# # run_visualization2('./billgates.jpg', './billgates2.jpg')
+# #
+# # i = 0
 def segment(frame):
     global seg_map1, seg_map2, use_first, i
 
@@ -92,6 +98,7 @@ use_first = True
 executor = ThreadPoolExecutor(2)
 future = executor.submit(segment, frame)
 
+j = 0
 while(True):
     # Capture frame-by-frame
     ret, frame = cap.read()
@@ -105,11 +112,23 @@ while(True):
     else:
         seg_map = seg_map2.copy()
 
-    # out_image = get_foreground(frame, seg_map)
+    out_image = get_foreground(frame, seg_map)
     rev_frame = frame[:,::-1]
     rev_sm = seg_map[:,::-1]
     foreground = combine_foregrounds(frame, seg_map, rev_frame, rev_sm)
-    out_image = add_background(frame, foreground, seg_map + rev_sm)
+    out_image = add_background(frame, foreground, np.maximum(seg_map, rev_sm))
+    # out_image = get_foreground(frame, seg_map)
+
+    # file = open("debug/seg" + str(j) + ".pkl", 'wb')
+    # pickle.dump(seg_map, file)
+    # file.close()
+    # file = open("debug/frame" + str(j) + ".pkl", 'wb')
+    # pickle.dump(frame, file)
+    # file.close()
+    # file = open("debug/out" + str(j) + ".pkl", 'wb')
+    # pickle.dump(out_image, file)
+    # file.close()
+    # j += 1
 
     # Display the resulting frame
     cv2.imshow('frame', out_image)
