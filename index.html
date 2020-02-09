@@ -1,128 +1,45 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>Sample: Single Party Calling</title>
-    <link rel="stylesheet" href="https://downloads.momentum-ui.com/@momentum-ui/core/css/momentum-ui.css">
-    <style>
-      main {
-        padding: 10px;
-      }
-      table {
-        border-collapse: collapse;
-        padding: 10px;
-        margin: 10px;
-      }
-      table, th, td {
-        border: 1px solid black;
-      }
-      thead th {
-        font-weight: bold;
-      }
-      tbody td {
-        min-width: 150px;
-      }
-    </style>
-  </head>
-  <body>
-    <header class="md-top-bar md-top-bar--dark" role="navigation">
-      <div class="md-top-bar__container row">
-        <div class="md-top-bar__brand">
-          <a class="md-brand" href="#">
-            <div class="md-brand__logo">
-              <i class="icon icon-cisco-logo"></i>
-            </div>
-            <div class="md-brand__title">Webex JS SDK Samples</div>
-          </a>
-        </div>
-        <nav class="md-top-bar__nav ">
-            <div class="md-list md-list--horizontal" role="list">
+<head>
+  <script type='text/javascript' src='https://cdn.scaledrone.com/scaledrone.min.js'></script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <style>
+    body {
+      display: flex;
+      height: 100vh;
+      margin: 0;
+      align-items: center;
+      justify-content: center;
+      padding: 0 50px;
+      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+    video {
+      max-width: calc(50% - 100px);
+      margin: 0 50px;
+      box-sizing: border-box;
+      border-radius: 2px;
+      padding: 0;
+      box-shadow: rgba(156, 172, 172, 0.2) 0px 2px 2px, rgba(156, 172, 172, 0.2) 0px 4px 4px, rgba(156, 172, 172, 0.2) 0px 8px 8px, rgba(156, 172, 172, 0.2) 0px 16px 16px, rgba(156, 172, 172, 0.2) 0px 32px 32px, rgba(156, 172, 172, 0.2) 0px 64px 64px;
+    }
+    .copy {
+      position: fixed;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 16px;
+      color: rgba(0, 0, 0, 0.5);
+    }
+  </style>
+</head>
+<body>
+  <div class="copy">Send your URL to a friend to start a video call</div>
+  <video id="localVideo" autoplay muted></video>
+  <video id="mergedVideo" autoplay></video>
+  <video id="remoteVideo" autoplay></video>
 
-            </div>
-          </nav>
-      </div>
-    </header>
-    <main>
-      <h1>Single Party Calling</h1>
-      <p>This sample demonstrates 1:1 calling.</p>
-      <form id="credentials">
-        <fieldset>
-          <legend>Credentials</legend>
-          <input
-            id="access-token"
-            name="accessToken"
-            placeholder="Your access token"
-            type="text">
-          <input id="connect" title="connect" type="submit" value="connect">
-          <p id="connection-status">disconnected</p>
-        </fieldset>
-      </form>
+  <script src="node_modules/video-stream-merger/dist/video-stream-merger.js"></script>
 
-      <form id="dialer">
-        <fieldset>
-          <legend>Dialer</legend>
-          <input
-            id="invitee"
-            name="invitee"
-            placeholder="Person ID or Email Address or SIP URI or Room ID"
-            type="text">
-            <input title="dial" type="submit" value="dial">
-        </fieldset>
-      </form>
-
-      <form id="constraints">
-        <fieldset>
-          <legend>Constraints</legend>
-          <input id="constraints-audio" title="audio" type="checkbox" checked>
-          <label for="constraints-audio">Audio</label>
-          <input id="constraints-video" title="video" type="checkbox" checked>
-          <label for="constraints-video">Video</label>
-        </fieldset>
-      </form>
-
-      <form id="call-controls">
-        <fieldset>
-          <legend>Call Controls</legend>
-          <button id="hangup" title="hangup" type="button">cancel/hangup</button>
-          <button id="extractlocalframe" title="extractlocalframe" type="button">extract local frame</button>
-          <button id="extractremoteframe" title="extractremoteframe" type="button">extract remote frame</button>
-          <button id="enablefacerec" title="enablefacerec" type="button">detect facial expressions</button>
-        </fieldset>
-      </form>
-
-      <table id="call-status">
-        <thead>
-            <tr>
-                <th colspan="2">Call Status</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>Local Participant</td>
-                <td id="call-status-local"></td>
-            </tr>
-            <tr>
-              <td>Remote Participant</td>
-              <td id="call-status-remote"></td>
-          </tr>
-        </tbody>
-      </table>
-
-      <div style="display: flex">
-        <video style="width:50%" id="self-view" muted autoplay playsinline></video>
-        <div style="width:50%; position:relative;">
-          <audio id="remote-view-audio" autoplay playsinline></audio>
-          <video style="width:100%" id="remote-view-video" autoplay muted playsinline></video>
-          <canvas style="width:100%; position:absolute; top:0; left:0" id="face-rec-overlay"></canvas>
-        </div>
-      </div>
-      <div style="display: flex">
-        <canvas style="width:50%" id="self-view-canvas"></canvas>
-        <canvas style="width:50%" id="audio-visualisation-canvas"></canvas>
-      </div>
-    </main>
-
-    <!-- app.js is your application code -->
-    <script src="bundle.js"></script>
-    <script src="face-api.js"></script>
-  </body>
+  <script src="script.js"></script>
+</body>
 </html>

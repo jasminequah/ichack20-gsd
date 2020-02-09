@@ -1,25 +1,22 @@
 {
-  "name": "webex-teams-browser-sdk-demo-with-facial-expression-recognition",
+  "name": "webrtc",
   "version": "1.0.0",
-  "description": "## 1) Prerequisites Ensure you have Node.js installed on your OS and that you have a valid Webex Teams access token from [developer.webex.com](https://developer.webex.com/), this can be either a bot or personal user access token.",
-  "main": "server.js",
+  "description": "<h1>Video chat App with WebRTC</h1>",
+  "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/amankhoza/webex-teams-browser-sdk-demo-with-facial-expression-recognition.git"
+    "url": "git+https://github.com/jasminequah/ichack20-gsd.git"
   },
-  "keywords": [],
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/amankhoza/webex-teams-browser-sdk-demo-with-facial-expression-recognition/issues"
+    "url": "https://github.com/jasminequah/ichack20-gsd/issues"
   },
-  "homepage": "https://github.com/amankhoza/webex-teams-browser-sdk-demo-with-facial-expression-recognition#readme",
+  "homepage": "https://github.com/jasminequah/ichack20-gsd#readme",
   "dependencies": {
-    "express": "^4.17.1",
-    "webex": "^1.80.109"
+    "video-stream-merger": "^3.3.1"
   }
 }
