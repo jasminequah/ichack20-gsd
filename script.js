@@ -82,27 +82,85 @@ function startWebRTC(isOfferer) {
     }
   };
 
-  const mergeStreams = (ctx, frame, done) => {
+  const mergeStreams = async (ctx, frame, done) => {
     newCanvas = document.createElement('canvas');
     newCanvas.width = merger.width;
     newCanvas.height = merger.height;
     ctx1 = newCanvas.getContext('2d');
     ctx1.drawImage(frame, 0, 0, merger.width, merger.height);
+    // console.log(newCanvas.width);
+    // console.log(newCanvas.height);
+    // fetch(url)
+    //     .then(function (response) {
+    //         console.log("HERE");
+    //         return response.text();
+    //     }).then(function (text) {
+    //         console.log('GET response text:');
+    //         console.log(text); // Print the greeting as text
+    //     });
 
     newFrame = ctx1.getImageData(0, 0, merger.width, merger.height);
     pixels = newFrame.data;
+
+    // TODO: Process the newFrame here
+    // console.log("HERE");
+    const proxyUrl = 'https://fast-stream-41806.herokuapp.com/'
+    const url = 'http://127.0.0.1:5000/segment'
+
+    const data = new FormData();
+    data.append('file', pixels);
+
+    // var data = JSON.stringify(pixels);
+
+    // var data = {
+    //   'image_base64': newCanvas.toDataURL("image/png")
+    // }
+
+    // const processedImage = fetch(proxyUrl + url,
 
     oldFrame = ctx.getImageData(0, 0, merger.width, merger.height);
     opixels = oldFrame.data;
     overlay = 0.5
 
-    for (let i = 0, n = pixels.length; i < n; i += 4) {
-      pixels[i] += overlay * opixels[i];
-      pixels[i+1] += overlay * opixels[i+1];
-      pixels[i+2] += overlay * opixels[i+2];
-    }
-    ctx.putImageData(newFrame, 0, 0);
-    done(); 
+    const processedImage = await fetch(url,
+        {
+            method: 'POST',
+            body: data
+        }).then(response => {
+          if (!response) return null;
+          return response.json()
+
+        }).then(data => {
+          if (data.status === '500') {
+            done();
+            return;
+          };
+          person = JSON.parse(data['file']);
+          for (let i = 0; i < opixels.length; i += 4) {
+            if (parseInt(person[i]) !== 0) {
+              opixels[i] = parseInt(person[i]);
+              opixels[i+1] = parseInt(person[i+1]);
+              opixels[i+2] = parseInt(person[i+2]);
+            }
+          }
+          // console.log("after: " + opixels);
+          ctx.putImageData(oldFrame, 0, 0);
+          done();
+          // console.log(response.json());
+          // return response.json();
+        });
+
+        // oldFrame = ctx.getImageData(0, 0, merger.width, merger.height);
+        // opixels = oldFrame.data;
+        // overlay = 0.5
+        //
+        // for (let i = 0, n = pixels.length; i < n; i += 4) {
+        //   opixels[i] += overlay * pixels[i];
+        //   opixels[i+1] += overlay * pixels[i+1];
+        //   opixels[i+2] += overlay * pixels[i+2];
+        // }
+        // ctx.putImageData(newFrame, 0, 0);
+        // done();
   }
 
   navigator.mediaDevices.getUserMedia({
@@ -146,6 +204,17 @@ function startWebRTC(isOfferer) {
     }
   });
 }
+
+function getBase64Image(imgElem) {
+// imgElem must be on the same server otherwise a cross-origin error will be thrown "SECURITY_ERR: DOM Exception 18"
+    var canvas = document.createElement("canvas");
+    canvas.width = imgElem.clientWidth;
+    canvas.height = imgElem.clientHeight;
+    var ctx = canvas.getContext("2d");
+    ctx.drawImage(imgElem, 0, 0);
+    var dataURL = canvas.toDataURL("image/png");
+    return dataURL.replace(/^data:image\/(png|jpg);base64,/, "");
+  }
 
 function localDescCreated(desc) {
   pc.setLocalDescription(
