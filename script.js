@@ -170,39 +170,38 @@ function getFaceDetectorOptions() {
     : new faceapi.TinyFaceDetectorOptions({ inputSize, scoreThreshold })
 }
 
-async function onPlay() {
-  let withBoxes = true
+// async function onPlay() {
+  // let withBoxes = true
 
-  const videoEl = document.getElementById('mergedVideo');
+  // const videoEl = document.getElementById('mergedVideo');
 
-  if(videoEl.paused || videoEl.ended)
-    return setTimeout(() => onPlay())
+  // if(videoEl.paused || videoEl.ended)
+  //   return setTimeout(() => onPlay())
 
 
-  const options = getFaceDetectorOptions()
+  // const options = getFaceDetectorOptions()
 
-  const ts = Date.now()
+  // const ts = Date.now()
 
-  const result = await faceapi.detectAllFaces(videoEl, options).withFaceExpressions()
+  // const result = await faceapi.detectSingleFace(videoEl, options).withFaceExpressions();
 
-  if (result) {
-    const canvas = document.getElementById("face-rec-overlay");
-    const dims = faceapi.matchDimensions(canvas, videoEl, true)
-
-    const resizedResult = faceapi.resizeResults(result, dims)
-    const minConfidence = 0.05
-    if (withBoxes) {
-      faceapi.draw.drawDetections(canvas, resizedResult)
-    }
-    faceapi.draw.drawFaceExpressions(canvas, resizedResult, minConfidence)
-  }
+  // if (result) {
+  //   const canvas = document.getElementById("face-rec-overlay");
+  //   const dims = faceapi.matchDimensions(canvas, videoEl, true)
+  //   const resizedResult = faceapi.resizeResults(result, dims)
+  //   const minConfidence = 0.05
+  //   if (withBoxes) {
+  //     faceapi.draw.drawDetections(canvas, resizedResult)
+  //   }
+  //   faceapi.draw.drawFaceExpressions(canvas, resizedResult, minConfidence)
+  // }
   
-  setTimeout(() => onPlay())
-}
+  // setTimeout(() => onPlay())
+// }
 
 runFaceRec().then(() => {
   console.log("Face recognition starting...");
-  onPlay();
+  // onPlay();
 }).catch(function(error) {
   console.log("Error loading Face Rec models\n");
   console.error(error.message);

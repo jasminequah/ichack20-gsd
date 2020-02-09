@@ -7,7 +7,6 @@
   <style>
     body {
       height: 100vh;
-      display: flex;
       margin: 0;
       align-items: center;
       justify-content: center;
@@ -26,24 +25,34 @@
       font-size: 16px;
       color: rgba(0, 0, 0, 0.5);
     }
+    #2d-game-canvas {
+      display: block;
+    }
   </style>
 </head>
 <body>
   <div class="copy">Send your URL to a friend to start a video call</div>
-  <video style="width:0%; display:none" id="localVideo" autoplay muted></video>
-  <div style="width:50%; position:relative">
-    <video style="width:100%; top:0; left: 0" id="mergedVideo" autoplay playsinline></video>
-    <canvas style="width:100%; position:absolute; top:0; left:0" id="face-rec-overlay"></canvas>
+  <div style="display:flex; height: 50vh; justify-content: center; align-items: center">
+    <video style="display:none" id="localVideo" autoplay muted></video>
+    <div style="width:50%; position:relative">
+      <video style="width:100%; top:0; left: 0" id="mergedVideo" autoplay playsinline></video>
+      <canvas style="width:100%; position:absolute; top:0; left:0" id="face-rec-overlay"></canvas>
+    </div>
+    <video style="display:none" id="remoteVideo" autoplay></video>
   </div>
-  <video style="width:0%; display:none" id="remoteVideo" autoplay></video>
+
   <form>
     <input type="radio" name="viewMode" id="sentiment-game"/>Sentiment Game<br>
     <input type="radio" name="viewMode" id="2d-game"/>2D Game<br>
   </form>
-
+  <div style="padding: 10px">
+    <canvas id="2d-game-canvas" style="width: 80%; height: 30vh; background:#eee"></canvas>
+  </div>
+  
   <script src="node_modules/video-stream-merger/dist/video-stream-merger.js"></script>
   <script src="face-api.js"></script>
   <script src="script.js"></script>
   <script src="sentiment-game.js"></script>
+  <script src="2d-game.js"></script>
 </body>
 </html>
