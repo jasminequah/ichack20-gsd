@@ -1,3 +1,7 @@
+# Stitch Call!
+<a href="https://youtu.be/wlyzsE8sHfA" target="_blank"><img src="https://youtu.be/wlyzsE8sHfA.jpg" 
+alt="Demo" width="240" height="180" border="10" /></a>
+
 # Inspiration
 When we are travelling or living far away from friends or loved ones, sometimes we just want to imagine being in the same space as them. What if we can play a game in the same 'space' as them, create a combined happy birthday video, or even film a vlog together remotely?
 
