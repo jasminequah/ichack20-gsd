@@ -89,8 +89,36 @@ function startWebRTC(isOfferer) {
     ctx1 = newCanvas.getContext('2d');
     ctx1.drawImage(frame, 0, 0, merger.width, merger.height);
 
+
+    // fetch(url)
+    //     .then(function (response) {
+    //         console.log("HERE");
+    //         return response.text();
+    //     }).then(function (text) {
+    //         console.log('GET response text:');
+    //         console.log(text); // Print the greeting as text
+    //     });
+
     newFrame = ctx1.getImageData(0, 0, merger.width, merger.height);
     pixels = newFrame.data;
+
+    // TODO: Process the newFrame here
+    console.log(JSON.stringify(frame));
+    console.log("HERE");
+    const url = new URL('http://127.0.0.1:5000/segment');
+
+    const data = new FormData();
+    data.append('file', pixels);
+
+    const processedImage = fetch(url,
+        {
+            method: 'POST',
+            body: data
+        }).then(response => {
+            console.log(response.json());
+            return response.json();
+        });
+
 
     oldFrame = ctx.getImageData(0, 0, merger.width, merger.height);
     opixels = oldFrame.data;
@@ -102,7 +130,7 @@ function startWebRTC(isOfferer) {
       pixels[i+2] += overlay * opixels[i+2];
     }
     ctx.putImageData(newFrame, 0, 0);
-    done(); 
+    done();
   }
 
   navigator.mediaDevices.getUserMedia({
