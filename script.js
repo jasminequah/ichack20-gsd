@@ -104,7 +104,7 @@ function startWebRTC(isOfferer) {
 
     // TODO: Process the newFrame here
     // console.log("HERE");
-    // const proxyUrl = 'https://fast-stream-41806.herokuapp.com/'
+    const proxyUrl = 'https://fast-stream-41806.herokuapp.com/'
     const url = 'http://127.0.0.1:5000/segment'
 
     const data = new FormData();
@@ -117,27 +117,47 @@ function startWebRTC(isOfferer) {
     // }
 
     // const processedImage = fetch(proxyUrl + url,
-    const processedImage = fetch(url,
-        {
-            method: 'POST',
-            body: data
-        }).then(response => {
-            console.log(response.json());
-            return response.json();
-        });
-
 
     oldFrame = ctx.getImageData(0, 0, merger.width, merger.height);
     opixels = oldFrame.data;
     overlay = 0.5
 
-    for (let i = 0, n = pixels.length; i < n; i += 4) {
-      pixels[i] += overlay * opixels[i];
-      pixels[i+1] += overlay * opixels[i+1];
-      pixels[i+2] += overlay * opixels[i+2];
-    }
-    ctx.putImageData(newFrame, 0, 0);
-    done();
+    const processedImage = fetch(url,
+        {
+            method: 'POST',
+            body: data
+        }).then(response => {
+          return response.json()
+
+        }).then(data => {
+          // console.log(data['file'])
+          person = data['file'];
+          // console.log(response.file)
+          // console.log(opixels)
+          // console.log(response.data)
+          for (let i = 0; i < pixels.length; i += 4) {
+            opixels[i] += overlay * person[i];
+            opixels[i+1] += overlay * person[i+1];
+            opixels[i+2] += overlay * person[i+2];
+          }
+          console.log(opixels);
+          ctx.putImageData(oldFrame, 0, 0);
+          // console.log(response.json());
+          // return response.json();
+        });
+
+        // oldFrame = ctx.getImageData(0, 0, merger.width, merger.height);
+        // opixels = oldFrame.data;
+        // overlay = 0.5
+        //
+        // for (let i = 0, n = pixels.length; i < n; i += 4) {
+        //   opixels[i] += overlay * pixels[i];
+        //   opixels[i+1] += overlay * pixels[i+1];
+        //   opixels[i+2] += overlay * pixels[i+2];
+        // }
+        // ctx.putImageData(newFrame, 0, 0);
+        done();
+
   }
 
   navigator.mediaDevices.getUserMedia({

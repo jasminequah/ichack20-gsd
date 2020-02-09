@@ -1,9 +1,10 @@
 from flask import Flask, jsonify, request, render_template
 from tflite_segmentation import get_foreground, Segmentor
 import numpy as np
+from flask_cors import CORS
 
 app = Flask(__name__)
-
+CORS(app)
 
 @app.route('/segment', methods=['GET', 'POST'])
 def segment_image():
