@@ -2,6 +2,7 @@
 <html>
 <head>
   <script type='text/javascript' src='https://cdn.scaledrone.com/scaledrone.min.js'></script>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
   <style>
@@ -31,27 +32,35 @@
   </style>
 </head>
 <body>
-  <div class="copy">Send your URL to a friend to start a video call</div>
-  <div style="display:flex; height: 50vh; justify-content: center; align-items: center">
-    <video style="display:none" id="localVideo" autoplay muted></video>
-    <div style="width:50%; position:relative">
-      <video style="width:100%; top:0; left: 0" id="mergedVideo" autoplay playsinline></video>
-      <canvas style="width:100%; position:absolute; top:0; left:0" id="face-rec-overlay"></canvas>
-    </div>
-    <video style="display:none" id="remoteVideo" autoplay></video>
+  <div style="display: flex; justify-content: center; padding: 20px; margin: 20px; background-color:#40c0c9; border-radius: 10px;">
+    Welcome! Send your URL to a friend to start a video call
   </div>
-
-  <form>
-    <input type="radio" name="viewMode" id="sentiment-game"/>Sentiment Game<br>
-    <input type="radio" name="viewMode" id="2d-game"/>2D Game<br>
-    <p id="yourScore">Your score: 0</p>
-    <p id="theirScore">Their score: 0</p>
-    <p id="goalExpression"></p>
-  </form>
-  <div style="padding: 10px">
+  <video style="width:0%; display:none" id="localVideo" autoplay muted></video>
+  <div style="flex-direction: row; display: flex; justify-content: center">
+  <div style="width:50%; position:relative; padding: 20px;">
+    <video style="width:110%; top:0; left: 0; overflow: hidden" id="mergedVideo" autoplay playsinline></video>
+    <canvas style="width:100%; position:absolute; top:0; left:0" id="face-rec-overlay"></canvas>
+  </div>
+    <form style="margin: 50px; padding: 20px; width: 260px; border-radius: 15px; background-color: #fa8684">
+      <h5>Game mode:</h5>
+      <div tyle="margin-bottom: 15px;" class="custom-control custom-radio">
+        <input type="radio" id="sentiment-game" name="game-mode" class="custom-control-input">
+        <label class="custom-control-label" for="sentiment-game">Best expression game</label>
+      </div>
+      <div style="margin-bottom: 15px;" class="custom-control custom-radio">
+        <input type="radio" id="2d-game" name="game-mode" class="custom-control-input">
+        <label class="custom-control-label" for="2d-game">2D Arcade game</label>
+      </div>
+      <p id="yourScore">Your score: 0</p>
+      <p id="theirScore">Their score: 0</p>
+      <p id="goalExpression"></p>
+    </form>
+    <video style="width:0%; display:none" id="remoteVideo" autoplay></video>
+  </div>
+  <div style="padding: 10px; display: flex; justify-content: center; margin-bottom: 40px">
     <canvas id="2d-game-canvas" style="width: 80%; height: 30vh; background:#eee"></canvas>
   </div>
-  
+
   <script src="node_modules/video-stream-merger/dist/video-stream-merger.js"></script>
   <script src="face-api.js"></script>
   <script src="script.js"></script>

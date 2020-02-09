@@ -23,6 +23,13 @@ async function runSentimentGame() {
         const result = await faceapi.detectAllFaces(videoEl, options).withFaceExpressions()
 
         if (result && result.length >= 1) {
+            const canvas = document.getElementById("face-rec-overlay");
+            const dims = faceapi.matchDimensions(canvas, videoEl, true)
+            const resizedResult = faceapi.resizeResults(result, dims)
+            const minConfidence = 0.05
+            faceapi.draw.drawDetections(canvas, resizedResult)
+            faceapi.draw.drawFaceExpressions(canvas, resizedResult, minConfidence)
+            
             if (parseFloat(result[0].expressions[EXPRESSIONS[curr_expression]]) > 0.2) {
                 if (parseInt(result[0].detection._box._x) < 110) {
                     leftScore++;
