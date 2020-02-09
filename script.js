@@ -88,8 +88,8 @@ function startWebRTC(isOfferer) {
     newCanvas.height = merger.height;
     ctx1 = newCanvas.getContext('2d');
     ctx1.drawImage(frame, 0, 0, merger.width, merger.height);
-
-
+    // console.log(newCanvas.width);
+    // console.log(newCanvas.height);
     // fetch(url)
     //     .then(function (response) {
     //         console.log("HERE");
@@ -103,17 +103,23 @@ function startWebRTC(isOfferer) {
     pixels = newFrame.data;
 
     // TODO: Process the newFrame here
-    console.log(JSON.stringify(frame));
-    console.log("HERE");
+    // console.log("HERE");
     const url = new URL('http://127.0.0.1:5000/segment');
 
-    const data = new FormData();
-    data.append('file', pixels);
+    // const data = new FormData();
+    // data.append('file', pixels);
+
+    var data = JSON.stringify(pixels);
+
+    var data = {
+      'image_base64': newCanvas.toDataURL("image/png")
+    }
 
     const processedImage = fetch(url,
         {
             method: 'POST',
-            body: data
+            body: data,
+            // headers: { 'Content-Type': 'application/json' }
         }).then(response => {
             console.log(response.json());
             return response.json();
