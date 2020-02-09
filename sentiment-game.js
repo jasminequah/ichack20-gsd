@@ -1,8 +1,8 @@
 document.getElementById("sentiment-game").addEventListener("click", function() {
     yourScore.innerHTML = "Your score: 0"
     theirScore.innerHTML = "Their score: 0"
-    gameCanvas = document.getElementById("2DGame");
-    gameCanvas.context.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
+    gameCanvas = document.getElementById("2d-game-canvas");
+    gameCanvas.getContext("2d").clearRect(0, 0, gameCanvas.width, gameCanvas.height);
     runSentimentGame();
 })
 
