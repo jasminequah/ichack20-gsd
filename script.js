@@ -77,12 +77,7 @@ function startWebRTC(isOfferer) {
   pc.ontrack = event => {
     const stream = event.streams[0];
     merger.addStream(stream, {
-      // draw: mergeStreams,
-      x: 100,
-      y: 100,
-      width: merger.width,
-      height: merger.height,
-      mute: false
+      draw: mergeStreams,
     });
 
     if (!remoteVideo.srcObject || remoteVideo.srcObject.id !== stream.id) {
@@ -90,9 +85,12 @@ function startWebRTC(isOfferer) {
     }
   };
 
-  // const mergeStreams = (ctx, frame, done) => {
-
-  // }
+  const mergeStreams = (ctx, frame, done) => {
+    var newFrame = frame;
+    // TODO: Process the newFrame here
+    ctx.drawImage(newFrame, 100, 100, merger.width, merger.height);
+    done();
+  }
 
   navigator.mediaDevices.getUserMedia({
     audio: true,
@@ -107,7 +105,6 @@ function startWebRTC(isOfferer) {
       height: merger.height,
       mute: false
     });
-    console.log("HERE")
     mergedVideo.srcObject = merger.result;
     // Add your stream to be sent to the conneting peer
     stream.getTracks().forEach(track => pc.addTrack(track, stream));
