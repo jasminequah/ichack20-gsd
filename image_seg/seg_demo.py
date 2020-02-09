@@ -24,7 +24,7 @@ def run_visualization(path):
     original_im = Image.open(path)
     img_array = np.asarray(original_im.convert('RGB'))
     seg_map = segm.get_segment_map(img_array)
-    out_image = segm.get_foreground(original_im, seg_map)
+    out_image = get_foreground(original_im, seg_map)
 
     vis_segmentation([original_im], [seg_map], [out_image])
 
@@ -45,77 +45,87 @@ def run_visualization2(path1, path2):
 # seg_maps = []
 # imgs = []
 # out_imgs = []
-# for i in range(3,10):
+# for i in range(2,10):
 #     # file = open("debug/seg" + str(i) + ".pkl", 'rb')
 #     # seg_maps.append(pickle.load(file))
 #     # file.close()
-#     file = open("debug/frame" + str(i) + ".pkl", 'rb')
-#     imgs.append(pickle.load(file))
-#     file.close()
-#     seg_maps.append(get_segment_map(imgs[-1]))
-#     out_imgs.append(get_foreground(imgs[-1], seg_maps[-1]))
+#     try:
+#
+#         file = open("debug/frame" + str(i) + ".pkl", 'rb')
+#         imgs.append(pickle.load(file))
+#         file.close()
+#         file = open("debug/seg" + str(i) + ".pkl", 'rb')
+#         seg_maps.append(pickle.load(file))
+#         file.close()
+#         # seg_maps.append(get_segment_map(imgs[-1]))
+#         # out_imgs.append(get_foreground(imgs[-1], seg_maps[-1]))
+#         file = open("debug/out" + str(i) + ".pkl", 'rb')
+#         out_imgs.append(pickle.load(file))
+#        file.close()
+#     except:
+#         pass
 #
 # vis_segmentation(imgs, seg_maps, out_imgs)
 
-# run_visualization('./billgates.jpg')
+run_visualization('./zuck.jpeg')
 # run_visualization2('./billgates.jpg', './billgates2.jpg')
 
 # i = 0
-def segment(frame):
-    global seg_map1, seg_map2, use_first, i
-
-    seg_map = segm.get_segment_map(frame)
-
-    # file = open("debug/seg" + str(i) + ".pkl", 'wb')
-    # pickle.dump(seg_map, file)
-    # file.close()
-    # file = open("debug/frame" + str(i) + ".pkl", 'wb')
-    # pickle.dump(frame, file)
-    # file.close()
-    # i +=1
-
-    if use_first:
-        seg_map2 = seg_map
-    else:
-        seg_map1 = seg_map
-    use_first = not use_first
-
-
-cap = cv2.VideoCapture(0)
-ret, frame = cap.read()
-
-# Our operations on the frame come here
-seg_map1 = segm.get_segment_map(frame)
-seg_map2 = seg_map1.copy()
-use_first = True
-
-executor = ThreadPoolExecutor(2)
-future = executor.submit(segment, frame)
-
-while(True):
-    # Capture frame-by-frame
-    ret, frame = cap.read()
-    if future.done():
-        future = executor.submit(segment, frame)
-
-    # # Our operations on the frame come here
-    # seg_map = get_segment_map(frame)
-    if use_first:
-        seg_map = seg_map1.copy()
-    else:
-        seg_map = seg_map2.copy()
-
-    # out_image = get_foreground(frame, seg_map)
-    rev_frame = frame[:,::-1]
-    rev_sm = seg_map[:,::-1]
-    foreground = combine_foregrounds(frame, seg_map, rev_frame, rev_sm)
-    out_image = add_background(frame, foreground, seg_map + rev_sm)
-
-    # Display the resulting frame
-    cv2.imshow('frame', out_image)
-    if cv2.waitKey(1) & 0xFF == ord('q'):
-        break
-
-# When everything done, release the capture
-cap.release()
-cv2.destroyAllWindows()
+# def segment(frame):
+#     global seg_map1, seg_map2, use_first, i
+#
+#     seg_map = segm.get_segment_map(frame)
+#
+#     # file = open("debug/seg" + str(i) + ".pkl", 'wb')
+#     # pickle.dump(seg_map, file)
+#     # file.close()
+#     # file = open("debug/frame" + str(i) + ".pkl", 'wb')
+#     # pickle.dump(frame, file)
+#     # file.close()
+#     # i +=1
+#
+#     if use_first:
+#         seg_map2 = seg_map
+#     else:
+#         seg_map1 = seg_map
+#     use_first = not use_first
+#
+#
+# cap = cv2.VideoCapture(0)
+# ret, frame = cap.read()
+#
+# # Our operations on the frame come here
+# seg_map1 = segm.get_segment_map(frame)
+# seg_map2 = seg_map1.copy()
+# use_first = True
+#
+# executor = ThreadPoolExecutor(2)
+# future = executor.submit(segment, frame)
+#
+# while(True):
+#     # Capture frame-by-frame
+#     ret, frame = cap.read()
+#     if future.done():
+#         future = executor.submit(segment, frame)
+#
+#     # # Our operations on the frame come here
+#     # seg_map = get_segment_map(frame)
+#     if use_first:
+#         seg_map = seg_map1.copy()
+#     else:
+#         seg_map = seg_map2.copy()
+#
+#     # out_image = get_foreground(frame, seg_map)
+#     rev_frame = frame[:,::-1]
+#     rev_sm = seg_map[:,::-1]
+#     foreground = combine_foregrounds(frame, seg_map, rev_frame, rev_sm)
+#     out_image = add_background(frame, foreground, seg_map + rev_sm)
+#
+#     # Display the resulting frame
+#     cv2.imshow('frame', out_image)
+#     if cv2.waitKey(1) & 0xFF == ord('q'):
+#         break
+#
+# # When everything done, release the capture
+# cap.release()
+# cv2.destroyAllWindows()

@@ -137,10 +137,13 @@ function startWebRTC(isOfferer) {
           };
           person = JSON.parse(data['file']);
           for (let i = 0; i < opixels.length; i += 4) {
-            if (parseInt(person[i]) !== 0) {
-              opixels[i] = parseInt(person[i]);
-              opixels[i+1] = parseInt(person[i+1]);
-              opixels[i+2] = parseInt(person[i+2]);
+            if (parseInt(person[i/4]) !== 0) {
+              // opixels[i] = parseInt(person[i]);
+              // opixels[i+1] = parseInt(person[i+1]);
+              // opixels[i+2] = parseInt(person[i+2]);
+              opixels[i] = pixels[i];
+              opixels[i+1] = pixels[i+1];
+              opixels[i+2] = pixels[i+2];
             }
           }
           // console.log("after: " + opixels);

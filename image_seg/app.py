@@ -46,10 +46,10 @@ def segment_image():
         # print(height)
         print("=============================================")
         seg_map = segm.get_segment_map(rgb.copy())
-        out_image = get_foreground(rgb, seg_map)
+        # out_image = get_foreground(rgb, seg_map)
         # print(rgb)
 
-        image[:,:,:-1] = out_image
+        # image[:,:,:-1] = out_image
 
         # file = open("debug/seg" + str(i) + ".pkl", 'wb')
         # pickle.dump(seg_map, file)
@@ -59,9 +59,12 @@ def segment_image():
         # file.close()
         # i +=1
 
-        out_stream = image.flatten()
-    
-        return {'file': json.dumps(out_stream.tolist())}
+        # out_stream = image.flatten()
+
+        seg_stream = seg_map.flatten()
+
+        # return {'file': json.dumps(out_stream.tolist())}
+        return {'file': json.dumps(seg_stream.tolist())}
 
 
     # GET request

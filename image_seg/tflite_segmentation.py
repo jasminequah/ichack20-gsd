@@ -82,7 +82,7 @@ def add_background(image, foreground, seg_map):
 
 def vis_segmentation(images, seg_maps, out_images):
     """Visualizes input image, segmentation map and overlay view."""
-    plt.figure(figsize=(15, 10))
+    plt.figure(figsize=(10, 7))
     grid_spec = gridspec.GridSpec(3, len(images))
 
     for i in range(len(images)):
