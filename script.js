@@ -1,13 +1,10 @@
-// Generate random room name if needed
-// var VideoStreamMerger = require('video-stream-merger');
-
 var merger = new VideoStreamMerger();
 merger.start();
 
 if (!location.hash) {
-  location.hash = Math.floor(Math.random() * 0xFFFFFF).toString(16);
+  location.hash = Math.floor(0xFFFFFF).toString(16);
 }
-const roomHash = location.hash.substring(1);
+const roomHash = 'location.hash.substring(1)';
 
 // TODO: Replace with your own channel ID
 const drone = new ScaleDrone('yiS12Ts5RdNhebyM');
@@ -86,10 +83,26 @@ function startWebRTC(isOfferer) {
   };
 
   const mergeStreams = (ctx, frame, done) => {
-    var newFrame = frame;
-    // TODO: Process the newFrame here
-    ctx.drawImage(newFrame, 100, 100, merger.width, merger.height);
-    done();
+    newCanvas = document.createElement('canvas');
+    newCanvas.width = merger.width;
+    newCanvas.height = merger.height;
+    ctx1 = newCanvas.getContext('2d');
+    ctx1.drawImage(frame, 0, 0, merger.width, merger.height);
+
+    newFrame = ctx1.getImageData(0, 0, merger.width, merger.height);
+    pixels = newFrame.data;
+
+    oldFrame = ctx.getImageData(0, 0, merger.width, merger.height);
+    opixels = oldFrame.data;
+    overlay = 0.5
+
+    for (let i = 0, n = pixels.length; i < n; i += 4) {
+      pixels[i] += overlay * opixels[i];
+      pixels[i+1] += overlay * opixels[i+1];
+      pixels[i+2] += overlay * opixels[i+2];
+    }
+    ctx.putImageData(newFrame, 0, 0);
+    done(); 
   }
 
   navigator.mediaDevices.getUserMedia({
