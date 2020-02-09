@@ -6,8 +6,8 @@
   <meta name="viewport" content="width=device-width">
   <style>
     body {
-      display: flex;
       height: 100vh;
+      display: flex;
       margin: 0;
       align-items: center;
       justify-content: center;
@@ -15,10 +15,6 @@
       font-family: -apple-system, BlinkMacSystemFont, sans-serif;
     }
     video {
-      max-width: calc(50% - 100px);
-      margin: 0 50px;
-      box-sizing: border-box;
-      border-radius: 2px;
       padding: 0;
       box-shadow: rgba(156, 172, 172, 0.2) 0px 2px 2px, rgba(156, 172, 172, 0.2) 0px 4px 4px, rgba(156, 172, 172, 0.2) 0px 8px 8px, rgba(156, 172, 172, 0.2) 0px 16px 16px, rgba(156, 172, 172, 0.2) 0px 32px 32px, rgba(156, 172, 172, 0.2) 0px 64px 64px;
     }
@@ -34,12 +30,20 @@
 </head>
 <body>
   <div class="copy">Send your URL to a friend to start a video call</div>
-  <video id="localVideo" autoplay muted></video>
-  <video id="mergedVideo" autoplay></video>
-  <video id="remoteVideo" autoplay></video>
+  <video style="width:0%; display:none" id="localVideo" autoplay muted></video>
+  <div style="width:50%; position:relative">
+    <video style="width:100%; top:0; left: 0" id="mergedVideo" autoplay playsinline></video>
+    <canvas style="width:100%; position:absolute; top:0; left:0" id="face-rec-overlay"></canvas>
+  </div>
+  <video style="width:0%; display:none" id="remoteVideo" autoplay></video>
+  <form>
+    <input type="radio" name="viewMode" id="sentiment-game"/>Sentiment Game<br>
+    <input type="radio" name="viewMode" id="2d-game"/>2D Game<br>
+  </form>
 
   <script src="node_modules/video-stream-merger/dist/video-stream-merger.js"></script>
-
+  <script src="face-api.js"></script>
   <script src="script.js"></script>
+  <script src="sentiment-game.js"></script>
 </body>
 </html>

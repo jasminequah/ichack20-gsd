@@ -78,9 +78,9 @@ function startWebRTC(isOfferer) {
     const stream = event.streams[0];
     merger.addStream(stream, {
       // draw: mergeStreams,
-      x: 100,
-      y: 100,
-      width: merger.width,
+      x: merger.width / 2,
+      y: 0,
+      width: merger.width / 2,
       height: merger.height,
       mute: false
     });
@@ -89,10 +89,6 @@ function startWebRTC(isOfferer) {
       remoteVideo.srcObject = stream;
     }
   };
-
-  // const mergeStreams = (ctx, frame, done) => {
-
-  // }
 
   navigator.mediaDevices.getUserMedia({
     audio: true,
@@ -103,11 +99,10 @@ function startWebRTC(isOfferer) {
     merger.addStream(stream, {
       x: 0,
       y: 0,
-      width: merger.width,
+      width: merger.width / 2,
       height: merger.height,
       mute: false
     });
-    console.log("HERE")
     mergedVideo.srcObject = merger.result;
     // Add your stream to be sent to the conneting peer
     stream.getTracks().forEach(track => pc.addTrack(track, stream));
@@ -144,3 +139,71 @@ function localDescCreated(desc) {
     onError
   );
 }
+
+/**
+ * ================
+ * Face recognition
+ * ================
+ */
+async function runFaceRec() {
+  // load face detection and face expression recognition models
+  await faceapi.loadFaceExpressionModel('/models')
+  // await faceapi.nets.ssdMobilenetv1.loadFromUri('/models')
+  await faceapi.nets.tinyFaceDetector.loadFromUri('/models')
+}
+
+const SSD_MOBILENETV1 = 'ssd_mobilenetv1'
+const TINY_FACE_DETECTOR = 'tiny_face_detector'
+
+let selectedFaceDetector = TINY_FACE_DETECTOR
+
+// ssd_mobilenetv1 options
+let minConfidence = 0.5
+
+// tiny_face_detector options
+let inputSize = 512
+let scoreThreshold = 0.5
+
+function getFaceDetectorOptions() {
+  return selectedFaceDetector === SSD_MOBILENETV1
+    ? new faceapi.SsdMobilenetv1Options({ minConfidence })
+    : new faceapi.TinyFaceDetectorOptions({ inputSize, scoreThreshold })
+}
+
+async function onPlay() {
+  let withBoxes = true
+
+  const videoEl = document.getElementById('mergedVideo');
+
+  if(videoEl.paused || videoEl.ended)
+    return setTimeout(() => onPlay())
+
+
+  const options = getFaceDetectorOptions()
+
+  const ts = Date.now()
+
+  const result = await faceapi.detectAllFaces(videoEl, options).withFaceExpressions()
+
+  if (result) {
+    const canvas = document.getElementById("face-rec-overlay");
+    const dims = faceapi.matchDimensions(canvas, videoEl, true)
+
+    const resizedResult = faceapi.resizeResults(result, dims)
+    const minConfidence = 0.05
+    if (withBoxes) {
+      faceapi.draw.drawDetections(canvas, resizedResult)
+    }
+    faceapi.draw.drawFaceExpressions(canvas, resizedResult, minConfidence)
+  }
+  
+  setTimeout(() => onPlay())
+}
+
+runFaceRec().then(() => {
+  console.log("Face recognition starting...");
+  onPlay();
+}).catch(function(error) {
+  console.log("Error loading Face Rec models\n");
+  console.error(error.message);
+});
