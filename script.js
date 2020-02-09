@@ -82,7 +82,7 @@ function startWebRTC(isOfferer) {
     }
   };
 
-  const mergeStreams = (ctx, frame, done) => {
+  const mergeStreams = async (ctx, frame, done) => {
     newCanvas = document.createElement('canvas');
     newCanvas.width = merger.width;
     newCanvas.height = merger.height;
@@ -122,26 +122,30 @@ function startWebRTC(isOfferer) {
     opixels = oldFrame.data;
     overlay = 0.5
 
-    const processedImage = fetch(url,
+    const processedImage = await fetch(url,
         {
             method: 'POST',
             body: data
         }).then(response => {
+          if (!response) return null;
           return response.json()
 
         }).then(data => {
-          // console.log(data['file'])
-          person = data['file'];
-          // console.log(response.file)
-          // console.log(opixels)
-          // console.log(response.data)
-          for (let i = 0; i < pixels.length; i += 4) {
-            opixels[i] += overlay * person[i];
-            opixels[i+1] += overlay * person[i+1];
-            opixels[i+2] += overlay * person[i+2];
+          if (data.status === '500') {
+            done();
+            return;
+          };
+          person = JSON.parse(data['file']);
+          for (let i = 0; i < opixels.length; i += 4) {
+            if (parseInt(person[i]) !== 0) {
+              opixels[i] = parseInt(person[i]);
+              opixels[i+1] = parseInt(person[i+1]);
+              opixels[i+2] = parseInt(person[i+2]);
+            }
           }
-          console.log(opixels);
+          // console.log("after: " + opixels);
           ctx.putImageData(oldFrame, 0, 0);
+          done();
           // console.log(response.json());
           // return response.json();
         });
@@ -156,8 +160,7 @@ function startWebRTC(isOfferer) {
         //   opixels[i+2] += overlay * pixels[i+2];
         // }
         // ctx.putImageData(newFrame, 0, 0);
-        done();
-
+        // done();
   }
 
   navigator.mediaDevices.getUserMedia({
