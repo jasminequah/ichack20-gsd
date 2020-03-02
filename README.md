@@ -1,4 +1,6 @@
 # Stitch Call!
+*Winner of IC Hack 2020*
+![video stream](stitchcall.png)
 <a href="https://youtu.be/wlyzsE8sHfA" target="_blank"><img src="https://youtu.be/wlyzsE8sHfA.jpg" 
 alt="Demo" width="240" height="180" border="10" /></a>
 
